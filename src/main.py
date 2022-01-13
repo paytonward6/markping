@@ -1,7 +1,8 @@
 import sys
 from pythonping import ping
 from tqdm import tqdm
-
+import os
+import traceback
 
 md = ""
 ping_filepath  = ""
@@ -12,15 +13,10 @@ else:
     ping_filepath = sys.argv[1]
     md = sys.argv[2]
 
-##### REMOVE AFTER COMPLETION ####
-##### USED FOR CODE WRITING AND DEBUGGING PURPOSES #####
-import os
-import traceback
 if os.path.exists(md):
     while True:
         user_input = str(input(f"Would you like to replace file {md} (y/n/q)? "))
         if user_input.__eq__('y'):
-            os.remove(md)
             break
         elif user_input.__eq__('n'):
             md = str(input(f"Provide name for ping results to be written to (foo.md): "))
@@ -31,7 +27,6 @@ if os.path.exists(md):
             print("Invalid input. Try again")
 else:
     print("\nFile: " + md + " will be created since it does not exist.")
-#################################
 
 ## Open File that contains IPs, DNS Servers, and Domain Names
 ping_file = open(ping_filepath, "r")
@@ -47,20 +42,25 @@ try:
     print("\nPinging " + str(len(to_ping)) + " items in " + ping_file.name)
 
     for i in tqdm(range(len(to_ping))):
-        #print("\n" + str(i + 1) + ": " + to_ping[i]) 
+        try:
+            #print("\n" + str(i + 1) + ": " + to_ping[i]) 
 
-        ping_record.write("\n## " + to_ping[i] + "\n") # heading for a specific ping
-        message = str(ping(to_ping[i]))
-        message = message.replace("\r", "")
+            ping_record.write("\n## " + to_ping[i] + "\n") # heading for a specific ping
+            message = str(ping(to_ping[i]))
+            message = message.replace("\r", "")
 
-        ping_record.write(message)
-        ping_record.write("\n")
+            ping_record.write(message)
+            ping_record.write("\n")
+        except:
+            message = f"ping: cannot resolve {to_ping[i]}: Unknown host"
+            message = message.replace("\r", "")
+
+            ping_record.write(message)
+            ping_record.write("\n")
 
 except: 
-    print(f"File {md} already exists.")
     traceback.print_exc()
 finally:
-
     #Mandatory file stream operations
     ping_record.flush()
     ping_record.close()
@@ -75,7 +75,7 @@ try:
 
     ## Creates a .md list out of the ping results ##
     for line in  md_lines:
-        if line[0] == "R":
+        if line[0] == "R" or line[0] == "p":
             if "min/avg/max" in line:
                 line = "\t- " + line # additional list indentation for Roung Trip results
             else:
