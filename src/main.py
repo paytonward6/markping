@@ -4,8 +4,10 @@ from pythonping import ping
 import os
 import traceback
 
-if os.path.exists("ping_record.md"):
-    os.remove("ping_record.md")
+md = "ping_record.md"
+
+if os.path.exists(md):
+    os.remove(md)
 else:
     print("File does not exist")
 #################################
@@ -17,10 +19,9 @@ to_ping = []
 for line in ping_file:
     line = line[:-1]
     to_ping.append(line)
-
+print(to_ping)
 try: 
-    ping_record_filename = "ping_record.md"
-    ping_record = open(ping_record_filename, "w")
+    ping_record = open(md, "w")
     ping_record.write("# Ping results from: "+ ping_file.name + "\n")
 
     print("Pinging items in " + ping_file.name)
@@ -31,8 +32,6 @@ try:
         ping_record.write("\n## " + to_ping[i] + "\n")
         message = str(ping(to_ping[i], verbose=True))
         message = message.replace("\r", "")
-        message.splitlines()
-#        print(message)
 
         ping_record.write(message)
         ping_record.write("\n")
@@ -48,3 +47,33 @@ finally:
 
     ping_file.close()
 
+##########################################
+altered_md_lines = []
+try:
+    markdown_file = open(md, "r")
+    md_lines = markdown_file.readlines()
+    for line in  md_lines:
+        if line[0] == "R":
+            if "min/avg/max" in line:
+                line = "\t- " + line
+            else:
+                line = "- " + line
+            altered_md_lines.append(line)
+        else:
+            altered_md_lines.append(line)
+    print(altered_md_lines)
+except:
+    traceback.print_exc()
+finally:
+    markdown_file.flush()
+    markdown_file.close()
+
+try:
+    final_md_file = open(md, "w")
+    for line in altered_md_lines:
+        final_md_file.write(line)
+except:
+    traceback.print_exc()
+finally:
+    final_md_file.flush()
+    final_md_file.close()
