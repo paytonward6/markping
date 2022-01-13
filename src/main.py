@@ -1,20 +1,40 @@
+import sys
 from pythonping import ping
+from tqdm import tqdm
+
+
+md = ""
+ping_filepath  = ""
+
+if len(sys.argv) < 2:
+    print("Usage: python3 main.py <input> <output>")
+else:
+    ping_filepath = sys.argv[1]
+    md = sys.argv[2]
 
 ##### REMOVE AFTER COMPLETION ####
 ##### USED FOR CODE WRITING AND DEBUGGING PURPOSES #####
 import os
 import traceback
-
-md = "ping_results.md"
-
 if os.path.exists(md):
-    os.remove(md)
+    while True:
+        user_input = str(input(f"Would you like to replace file {md} (y/n/q)? "))
+        if user_input.__eq__('y'):
+            os.remove(md)
+            break
+        elif user_input.__eq__('n'):
+            md = str(input(f"Provide name for ping results to be written to (foo.md): "))
+            break
+        elif user_input.__eq__('q'):
+            sys.exit(0)
+        else:
+            print("Invalid input. Try again")
 else:
-    print("\nFile: " + md + " does not exist. No file deleted")
+    print("\nFile: " + md + " will be created since it does not exist.")
 #################################
 
 ## Open File that contains IPs, DNS Servers, and Domain Names
-ping_file = open("./to_ping.txt", "r")
+ping_file = open(ping_filepath, "r")
 
 to_ping = []
 for line in ping_file:
@@ -26,18 +46,18 @@ try:
 
     print("\nPinging " + str(len(to_ping)) + " items in " + ping_file.name)
 
-    for i in range(len(to_ping)):
-        print("\n" + str(i + 1) + ": " + to_ping[i]) 
+    for i in tqdm(range(len(to_ping))):
+        #print("\n" + str(i + 1) + ": " + to_ping[i]) 
 
         ping_record.write("\n## " + to_ping[i] + "\n") # heading for a specific ping
-        message = str(ping(to_ping[i], verbose=True))
+        message = str(ping(to_ping[i]))
         message = message.replace("\r", "")
 
         ping_record.write(message)
         ping_record.write("\n")
 
 except: 
-    print(f"File {ping_record_filename} already exists.")
+    print(f"File {md} already exists.")
     traceback.print_exc()
 finally:
 
