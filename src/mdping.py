@@ -41,8 +41,8 @@ try:
 
     print("\nPinging " + str(len(to_ping)) + " items in " + ping_file.name)
     
-    ping_count = 3
-    ping_wait_duration = 0.2 # in seconds
+    ping_count = 4
+    ping_wait_duration = 0.1 # in seconds
     for i in tqdm(range(len(to_ping))):
         try:
             ping_record.write("\n## " + to_ping[i] + "\n") # heading for a specific ping
