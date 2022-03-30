@@ -57,7 +57,6 @@ try:
 
             ping_record.write(message)
             ping_record.write("\n")
-
 except: 
     traceback.print_exc()
 finally:
@@ -88,6 +87,7 @@ except:
 finally:
     markdown_file.flush()
     markdown_file.close()
+
 ## Applies final changs to the ping results ##
 try:
     final_md_file = open(md, "w")
