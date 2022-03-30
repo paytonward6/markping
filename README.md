@@ -1,4 +1,4 @@
-# network-tools
+# mdping
 
 ## Overview
 
@@ -7,7 +7,11 @@ This is a hobby project to get more experience with programming in python. If yo
 ### About src/mdping*.py
 
 - Allows one to ping a list of IPs, domain names, DNS servers, etc. and output the results in Markdown format. 
-- I personally wanted to be able to use this with [grip -b /path/to/markdown_file.md](https://github.com/joeyespo/grip)
+- I personally wanted to be able to use this with [grip](https://github.com/joeyespo/grip)
+like this 
+```console
+   $ grip -b /path/to/markdown/file.md
+```
 
 #### mdping vs. mdping_pythonping
 - mdping uses the pre-installed *subproccess* package and the ping command pre-installed on the system
@@ -15,3 +19,13 @@ This is a hobby project to get more experience with programming in python. If yo
     - *wait* and *count* can be changed directly in the source with variables **ping_wait_duration** respectively **ping_count**.
 
 - *pythonping* can only be used with **sudo**. mdping's implementation with *subprocess* eliminates the use of sudo.
+
+### Installation
+```console
+    $ git clone https://github.com/paytonward6/mdping.git
+```
+
+### Usage
+```console
+    $ python3 mdping <ping list>.txt <ping results>.md
+```
