@@ -1,7 +1,6 @@
 #ping_results = subprocess.run(["ping",  "-c", "4", "google.com"])
 
 import sys
-from pythonping import ping
 from tqdm import tqdm
 import os
 import traceback
@@ -44,29 +43,28 @@ try:
 
     print("\nPinging " + str(len(to_ping)) + " items in " + ping_file.name)
     
-    c = 4
+    c = 3
     wait = 0.2
     for i in tqdm(range(len(to_ping))):
         try:
-            #print("\n" + str(i + 1) + ": " + to_ping[i]) 
-
             ping_record.write("\n## " + to_ping[i] + "\n") # heading for a specific ping
-            messages = subprocess.run(["ping",  "-c", str(c), "-i", str(wait), to_ping[i]],
-                                          stdout=subprocess.PIPE).stdout
-            messages = messages.decode('UTF-8')
-
-            messages = messages.split("\n")
-            for message in messages:
-                print(message)
-                ping_record.write(message)
-                ping_record.write("\n")
- 
-            #message = message.replace("\r", "")
+            result = subprocess.run(["ping",  "-c", str(c), "-i", str(wait), to_ping[i]],
+                                          capture_output=True)
+            stdout = result.stdout.decode('UTF-8')
+            stdout = stdout.split("\n")
+            stderr = result.stderr.decode('UTF-8')
+            
+            if "Unknown host" in stderr:
+                ping_record.write(stderr)
+            else:
+                for output in stdout:
+                    ping_record.write(output)
+                    ping_record.write("\n")
 
         except:
             message = f"ping: cannot resolve {to_ping[i]}: Unknown host"
-            message = message.replace("\r", "")
-
+            #message = message.replace("\r", "")
+            print(message)
             ping_record.write(message)
             ping_record.write("\n")
             traceback.print_exc()
@@ -88,21 +86,15 @@ try:
 
     ## Creates a .md list out of the ping results ##
     for line in md_lines:
-        if line[0] == "#":
+        if line[0] == "#" or line[0] == "P":
             altered_md_lines.append(line)
-        else: 
-            if line[0] == "P":
-                altered_md_lines.append(line)
-            elif "icmp_seq" in  line:
-                altered_md_lines.append("- " + line)
-            elif "min/avg/max" or "packets transmitted" in line:
-                if line == '\n':
-                    continue
-                elif "statistics" in line:
-                    continue
-                else:
-                    line = "\t- " + line # additional list indentation for Roung Trip results
-                    altered_md_lines.append(line)
+        elif line == '\n' or "statistics" in line:
+            continue
+        elif line[0] == str(c) or line[0] == 'r':
+            line = "\t- " + line # additional list indentation for Roung Trip results
+            altered_md_lines.append(line)
+        elif "icmp_seq" or "Unknown host" in line:
+            altered_md_lines.append("- " + line)
 except:
     traceback.print_exc()
 finally:
