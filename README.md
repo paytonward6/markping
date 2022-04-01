@@ -34,5 +34,5 @@ like this
 
 ### Usage
 ```console
-    $ python3 markping <ping list>.txt <ping results>.md
+    $ python3 markping.py <ping list>.txt <ping results>.md
 ```
